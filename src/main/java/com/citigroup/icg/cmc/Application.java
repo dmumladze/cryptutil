@@ -37,7 +37,7 @@ public class Application {
             //TODO #9: create CSV file if -input-file is set and create header row
             for (ArchiveResult result : results) {
                 for (FileInfo fileInfo : result.getArchivedFiles()) {
-                    //TODO #9: add columns 'OriginalFileName', 'ArchivedFileName', 'DateCreated', 'FileSize'
+                    //TODO #9: add columns 'OriginalFileName', 'ArchivedFileName', 'DateCreated', 'FileSize', 'Error'
                 }
             }
         } catch (Exception e) {
