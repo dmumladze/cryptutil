@@ -30,6 +30,7 @@ public class ArchiveOptions {
         requiredOptions.addOption("recurse", false, "Searches given path recursively.");
         //TODO #3: rename to "skip-ext"
         requiredOptions.addOption("exclude", true, "Pattern of the end path that is to be excluded.");
+        //TODO #4: rename to estimate - isEstimate()
         requiredOptions.addOption("measure", false, "Measures the time it may take to complete.");
         requiredOptions.addOption("help", false, "Displays command-line options.");
     }
@@ -94,7 +95,6 @@ public class ArchiveOptions {
                 .collect(Collectors.toCollection(ArrayList<String>::new));
     }
 
-    //TODO #4: rename to test - isTest()
     public boolean isMeasure() {
         return this.measure;
     }
