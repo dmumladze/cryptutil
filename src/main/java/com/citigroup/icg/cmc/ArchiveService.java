@@ -64,7 +64,7 @@ public class ArchiveService {
                     Files.deleteIfExists(Paths.get(zipFile.getAbsolutePath()));
                 } else {
                     fileInfo.setArchivedFile(zipFile);
-                    //TODO #5: delete original file
+                    //TODO #6: delete original file
                 }
             } catch (Exception e) {
                 fileInfo.setError(e);
