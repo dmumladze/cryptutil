@@ -25,7 +25,10 @@ public class ArchiveOptions {
         requiredOptions = new Options();
         requiredOptions.addRequiredOption("path", "", true, "Path to be searched for.");
         requiredOptions.addRequiredOption("password", "", true, "Password for encrypted files.");
+        //TODO #1: add -input-file option
+        //TODO #2: remove -recurse option
         requiredOptions.addOption("recurse", false, "Searches given path recursively.");
+        //TODO #3: rename to "skip-ext"
         requiredOptions.addOption("exclude", true, "Pattern of the end path that is to be excluded.");
         requiredOptions.addOption("measure", false, "Measures the time it may take to complete.");
         requiredOptions.addOption("help", false, "Displays command-line options.");
@@ -91,6 +94,7 @@ public class ArchiveOptions {
                 .collect(Collectors.toCollection(ArrayList<String>::new));
     }
 
+    //TODO #4: rename to test - isTest()
     public boolean isMeasure() {
         return this.measure;
     }

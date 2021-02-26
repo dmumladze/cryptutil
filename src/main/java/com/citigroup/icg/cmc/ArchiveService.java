@@ -20,8 +20,7 @@ public class ArchiveService {
         this.options = options;
     }
 
-    public Collection<ArchiveResult> runArchiver(ProgressReporter reporter) {
-        List<File> files = FileTraverser.getFiles(options.getPath(), options.getExcludes());
+    public Collection<ArchiveResult> runArchiver(List<File> files, ProgressReporter reporter) {
         this.storage = new FileStorage(files);
 
         reporter.log("Found %d files %n", files.size() - 1);
@@ -39,12 +38,15 @@ public class ArchiveService {
         Collection<ArchiveResult> results = new ArrayList<>(processorCount);
         try {
             List<Future<ArchiveResult>> futureResults = exec.invokeAll(tasks);
-        } catch (InterruptedException e) {
+            for (Future<ArchiveResult> result : futureResults) {
+                results.add(result.get());
+            }
+        } catch (InterruptedException | ExecutionException e) {
             reporter.log(e.getMessage());
         } finally {
             exec.shutdown();
         }
-        return  results;
+        return results;
     }
 
     private ArchiveResult archiverTask(ProgressReporter reporter) {
@@ -56,17 +58,24 @@ public class ArchiveService {
             }
             FileInfo fileInfo = new FileInfo(file);
             try {
-                archiveFile(fileInfo);
+                File zipFile = archiveFile(fileInfo);
+                if (this.options.isMeasure()) {
+                    //delete file if program running with -test option
+                    Files.deleteIfExists(Paths.get(zipFile.getAbsolutePath()));
+                } else {
+                    fileInfo.setArchivedFile(zipFile);
+                    //TODO #5: delete original file
+                }
             } catch (Exception e) {
                 fileInfo.setError(e);
             }
-            result.addFileInfo(fileInfo);
+            result.addArchivedFile(fileInfo);
             reporter.report(1);
         }
         return result;
     }
 
-    private void archiveFile(FileInfo fileInfo) throws Exception {
+    private File archiveFile(FileInfo fileInfo) throws Exception {
         ZipFile zipFile = new ZipFile(fileInfo.getOriginalFile().getAbsolutePath() + ".zip");
 
         ZipParameters params = new ZipParameters();
@@ -78,12 +87,7 @@ public class ArchiveService {
         params.setPassword(this.options.getPassword());
 
         zipFile.addFile(fileInfo.getOriginalFile(), params);
-
-        if (this.options.isMeasure()) {
-            Files.deleteIfExists(Paths.get(zipFile.getFile().getAbsolutePath()));
-        } else {
-            fileInfo.setArchivedFile(zipFile.getFile());
-        }
+        return zipFile.getFile();
     }
 
     static class FileStorage {
