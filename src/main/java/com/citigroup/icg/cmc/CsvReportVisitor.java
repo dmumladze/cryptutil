@@ -19,6 +19,7 @@ public class CsvReportVisitor implements Visitor<ArchiveResults> {
 
     @Override
     public void visit(ArchiveResults results) {
+        reporter.log("Generating report...");
         try {
             if (outputFilePath != null) {
                 Files.deleteIfExists(outputFilePath);
@@ -28,22 +29,37 @@ public class CsvReportVisitor implements Visitor<ArchiveResults> {
             }
 
             PrintWriter writer = new PrintWriter(new FileWriter(outputFilePath.toFile().getAbsoluteFile()));
-            writer.println("OriginalFileName|ArchivedFileName|DateCreated|FileSize|rror");
 
             for (ArchiveFileInfo fileInfo : results.getArchivedFiles()) {
                 String originalFile = fileInfo.getOriginalFile();
-                BasicFileAttributes attributes = Files.readAttributes(Paths.get(originalFile), BasicFileAttributes.class);
+                String archivedFile = fileInfo.getArchivedFile();
 
-                writer.println(String.format("%s|%s|%s|%s|%s", originalFile, fileInfo.getArchivedFile(),
-                    attributes.creationTime(),
-                    attributes.size(),
-                    fileInfo.getExceptionAsString()
-                ));
+                BasicFileAttributes attributes = null;
+
+                if (Files.exists(Paths.get(archivedFile))) {
+                    writer.println("OriginalFileName|ArchivedFileName|DateCreated|ArchivedFileSize|Error");
+                    attributes = Files.readAttributes(Paths.get(archivedFile), BasicFileAttributes.class);
+                } else if (Files.exists(Paths.get(originalFile))) {
+                    writer.println("OriginalFileName|ArchivedFileName|DateCreated|OriginalFileSize|Error");
+                    attributes = Files.readAttributes(Paths.get(originalFile), BasicFileAttributes.class);
+                }
+
+                if (attributes != null) {
+                    writer.println(String.format("%s|%s|%s|%s|%s", originalFile, archivedFile,
+                            attributes.creationTime(),
+                            attributes.size(),
+                            fileInfo.getExceptionAsString()
+                    ));
+                } else {
+                    writer.println(String.format("%s|%s|%s|%s|%s", originalFile, archivedFile,
+                            "", "", fileInfo.getExceptionAsString()
+                    ));
+                }
             }
             writer.close();
             reporter.log("Report: %s", outputFilePath.toString());
         } catch (Exception e) {
-            reporter.log("Error: %s", e.toString());
+            reporter.log(e);
         }
     }
 }

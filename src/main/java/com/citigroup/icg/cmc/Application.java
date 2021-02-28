@@ -16,9 +16,13 @@ public class Application {
             }
             options = ArchiveOptions.parseRequired(args);
 
+            reporter.log("Looking for files...");
+
             List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt());
             if (files.size() == 0)
                 throw new Exception("There are no files to encrypt.");
+
+            reporter.log("Found %d files %n", files.size() - 1);
 
             ArchiveService service = new ArchiveService(options);
             ArchiveResults results = service.runArchiver(files, reporter);

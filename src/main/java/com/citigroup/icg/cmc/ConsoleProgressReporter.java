@@ -8,9 +8,6 @@ public class ConsoleProgressReporter implements ProgressReporter {
     private ProgressBar progress;
 
     public void init(long max) {
-        if (this.progress != null) {
-            this.progress.close();
-        }
         this.progress = new ProgressBar("Archiving...", max);
     }
 
@@ -36,6 +33,8 @@ public class ConsoleProgressReporter implements ProgressReporter {
     }
 
     public void complete() {
-        this.progress.close();
+        if (this.progress != null) {
+            this.progress.close();
+        }
     }
 }

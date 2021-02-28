@@ -22,7 +22,6 @@ public class ArchiveService {
     public ArchiveResults runArchiver(List<File> files, ProgressReporter reporter) {
         this.storage = new FileStorage(files);
 
-        reporter.log("Found %d files %n", files.size() - 1);
         reporter.init(files.size() - 1);
 
         List<Callable<ArchiveResults>> tasks = new ArrayList<>();
@@ -66,7 +65,7 @@ public class ArchiveService {
                 } else {
                     fileInfo.setArchivedFile(zipFile.getAbsolutePath());
                     if (file.setWritable(true))
-                        Files.delete(file.toPath());
+                        Files.deleteIfExists(file.toPath());
                 }
             } catch (Exception e) {
                 fileInfo.setException(e);
