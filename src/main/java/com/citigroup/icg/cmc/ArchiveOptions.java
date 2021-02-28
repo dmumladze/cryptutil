@@ -2,8 +2,6 @@ package com.citigroup.icg.cmc;
 
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,8 +54,8 @@ public class ArchiveOptions {
         this.setHelp(cmd);
     }
 
-    public OptionsValidationResults validate() {
-        OptionsValidationResults results = new OptionsValidationResults();
+    public ValidationResults validate() {
+        ValidationResults results = new ValidationResults();
 
         return results;
     }

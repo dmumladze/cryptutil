@@ -16,9 +16,9 @@ public class Application {
             }
             options = ArchiveOptions.parseRequired(args);
 
-            OptionsValidationResults validationResults = options.validate();
+            ValidationResults validationResults = options.validate();
             if (!validationResults.isValid()) {
-                ValidationResultsConsolePrinter printer = new ValidationResultsConsolePrinter();
+                ValidationResultsPrinter printer = new ValidationResultsPrinter();
                 validationResults.accept(printer);
                 System.exit(0);
             }

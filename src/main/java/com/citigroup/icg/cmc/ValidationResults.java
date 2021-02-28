@@ -2,7 +2,7 @@ package com.citigroup.icg.cmc;
 
 import java.util.ArrayList;
 
-public class OptionsValidationResults {
+public class ValidationResults {
     private ArrayList<String> inputPathErrors;
     private ArrayList<String> passwordErrors;
     private ArrayList<String> skipExtErrors;
@@ -45,7 +45,7 @@ public class OptionsValidationResults {
                 && outputFilePathErrors == null;
     }
 
-    public void accept(Visitor<OptionsValidationResults> visitor) {
+    public void accept(Visitor<ValidationResults> visitor) {
         visitor.visit(this);
     }
 }
