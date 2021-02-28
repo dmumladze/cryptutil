@@ -8,7 +8,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -20,26 +19,28 @@ public class ArchiveService {
         this.options = options;
     }
 
-    public Collection<ArchiveResult> runArchiver(List<File> files, ProgressReporter reporter) {
+    public ArchiveResults runArchiver(List<File> files, ProgressReporter reporter) {
         this.storage = new FileStorage(files);
 
         reporter.log("Found %d files %n", files.size() - 1);
         reporter.init(files.size() - 1);
 
-        List<Callable<ArchiveResult>> tasks = new ArrayList<>();
-        //use only 70% of available processors
-        int processorCount = (int) Math.round((Runtime.getRuntime().availableProcessors() / 100.0) * 70);
+        List<Callable<ArchiveResults>> tasks = new ArrayList<>();
+        //use only 70% of processors' cores
+        int processorCount = (int) Math.ceil((Runtime.getRuntime().availableProcessors() / 100.0) * 70);
 
         for (int i = 0; i <= processorCount; i++) {
             tasks.add(() -> archiverTask(reporter));
         }
 
         ExecutorService exec = Executors.newFixedThreadPool(processorCount);
-        Collection<ArchiveResult> results = new ArrayList<>(processorCount);
+        ArchiveResults results = new ArchiveResults();
         try {
-            List<Future<ArchiveResult>> futureResults = exec.invokeAll(tasks);
-            for (Future<ArchiveResult> result : futureResults) {
-                results.add(result.get());
+            List<Future<ArchiveResults>> futureResults = exec.invokeAll(tasks);
+            for (Future<ArchiveResults> result : futureResults) {
+                for (ArchiveFileInfo fileInfo : result.get().getArchivedFiles()) {
+                    results.addArchivedFile(fileInfo);
+                }
             }
         } catch (InterruptedException | ExecutionException e) {
             reporter.log(e.getMessage());
@@ -49,25 +50,26 @@ public class ArchiveService {
         return results;
     }
 
-    private ArchiveResult archiverTask(ProgressReporter reporter) {
-        ArchiveResult result = new ArchiveResult();
+    private ArchiveResults archiverTask(ProgressReporter reporter) {
+        ArchiveResults result = new ArchiveResults();
         while (true) {
             File file = this.storage.get();
             if (file == null) {
                 break;
             }
-            FileInfo fileInfo = new FileInfo(file);
+            ArchiveFileInfo fileInfo = new ArchiveFileInfo(file.getAbsolutePath());
             try {
-                File zipFile = archiveFile(fileInfo);
-                if (this.options.isMeasure()) {
-                    //delete file if program running with -test option
+                File zipFile = archiveFile(file);
+                if (this.options.isTest()) {
+                    //delete file if program running with --estimate option
                     Files.deleteIfExists(Paths.get(zipFile.getAbsolutePath()));
                 } else {
-                    fileInfo.setArchivedFile(zipFile);
-                    //TODO #6: delete original file
+                    fileInfo.setArchivedFile(zipFile.getAbsolutePath());
+                    file.setWritable(true);
+                    Files.delete(file.toPath());
                 }
             } catch (Exception e) {
-                fileInfo.setError(e);
+                fileInfo.setException(e);
             }
             result.addArchivedFile(fileInfo);
             reporter.report(1);
@@ -75,8 +77,8 @@ public class ArchiveService {
         return result;
     }
 
-    private File archiveFile(FileInfo fileInfo) throws Exception {
-        ZipFile zipFile = new ZipFile(fileInfo.getOriginalFile().getAbsolutePath() + ".zip");
+    private File archiveFile(File file) throws Exception {
+        ZipFile zipFile = new ZipFile(file.getAbsolutePath() + ".zip");
 
         ZipParameters params = new ZipParameters();
         params.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
@@ -86,7 +88,7 @@ public class ArchiveService {
         params.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
         params.setPassword(this.options.getPassword());
 
-        zipFile.addFile(fileInfo.getOriginalFile(), params);
+        zipFile.addFile(file, params);
         return zipFile.getFile();
     }
 

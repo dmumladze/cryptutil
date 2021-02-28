@@ -2,6 +2,10 @@ package com.citigroup.icg.cmc;
 
 import org.apache.commons.cli.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,31 +13,26 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class ArchiveOptions {
-    private String path;
+    private Path inputPath;
     private String password;
-    private boolean recurse;
-    private Collection<String> excludes;
-    private boolean measure;
+    private Collection<String> skipExt;
+    private boolean test;
+    private Path outputFilePath;
     private boolean help;
     private static final Options helpOptions;
     private static final Options requiredOptions;
 
     static {
         helpOptions = new Options();
-        helpOptions.addOption("help", false, "Displays command-line options.");
+        helpOptions.addOption(null, "help", false, "Displays command-line options.");
 
         requiredOptions = new Options();
-        requiredOptions.addRequiredOption("path", "", true, "Path to be searched for.");
-        //TODO #1: add -input-file option
-        requiredOptions.addRequiredOption("password", "", true, "Password for encrypted files.");
-        //TODO #2: remove -recurse option
-        requiredOptions.addOption("recurse", false, "Searches given path recursively.");
-        //TODO #3: rename to "skip-ext"
-        requiredOptions.addOption("exclude", true, "Pattern of the end path that is to be excluded.");
-        //TODO #4: rename to estimate - isEstimate()
-        requiredOptions.addOption("measure", false, "Measures the time it may take to complete.");
-        //TODO #5: add -output-file option
-        requiredOptions.addOption("help", false, "Displays command-line options.");
+        requiredOptions.addRequiredOption("I", "input-path", true, "Directory or file to be searched for.");
+        requiredOptions.addRequiredOption("P", "password", true, "Password for encrypted files.");
+        requiredOptions.addOption("S", "skip-ext", true, "Skips files with provided extensions.");
+        requiredOptions.addOption("T", "test", false, "Test run will neither encrypt nor delete file.");
+        requiredOptions.addOption("O", "output-file", true, "File to print the report to.");
+        requiredOptions.addOption("H", "help", false, "Displays command-line options.");
     }
 
     public static ArchiveOptions parseHelp(String[] args) throws ParseException {
@@ -49,20 +48,20 @@ public class ArchiveOptions {
     }
 
     private ArchiveOptions(CommandLine cmd) {
-        this.setPath(cmd);
+        this.setInputPath(cmd);
         this.setPassword(cmd);
-        this.setRecurse(cmd);
-        this.setExcludes(cmd);
-        this.setMeasure(cmd);
+        this.setSkipExt(cmd);
+        this.setTest(cmd);
+        this.setOutputFilePath(cmd);
         this.setHelp(cmd);
     }
-    public String getPath() {
-        return this.path;
+    public Path getInputPath() {
+        return inputPath;
     }
 
-    private void setPath(CommandLine cmd) {
-        if (cmd.hasOption("path"))
-            this.path = cmd.getOptionValue("path");
+    private void setInputPath(CommandLine cmd) {
+        if (cmd.hasOption("input-path"))
+            this.inputPath = Paths.get(cmd.getOptionValue("input-path"));
     }
 
     public String getPassword() {
@@ -74,34 +73,34 @@ public class ArchiveOptions {
             this.password = cmd.getOptionValue("password");
     }
 
-    public boolean isRecurse() {
-        return this.recurse;
+    public Collection<String> getSkipExt() {
+        return this.skipExt;
     }
 
-    private void setRecurse(CommandLine cmd) {
-        if (cmd.hasOption("password"))
-            this.recurse = Boolean.parseBoolean(cmd.getOptionValue("password"));
-    }
-
-    public Collection<String> getExcludes() {
-        return this.excludes;
-    }
-
-    private void setExcludes(CommandLine cmd) {
-        if (!cmd.hasOption("exclude"))
+    private void setSkipExt(CommandLine cmd) {
+        if (!cmd.hasOption("skip-ext"))
             return;
-        this.excludes = Arrays.stream(cmd.getOptionValue("exclude").split(","))
+        this.skipExt = Arrays.stream(cmd.getOptionValue("skip-ext").split(","))
                 .distinct()
                 .map(x -> x.toLowerCase(Locale.ROOT))
                 .collect(Collectors.toCollection(ArrayList<String>::new));
     }
 
-    public boolean isMeasure() {
-        return this.measure;
+    public boolean isTest() {
+        return this.test;
     }
 
-    private void setMeasure(CommandLine cmd) {
-        this.measure = cmd.hasOption("measure");
+    private void setTest(CommandLine cmd) {
+        this.test = cmd.hasOption("test");
+    }
+
+    public Path getOutputFilePath() {
+        return outputFilePath;
+    }
+
+    private void setOutputFilePath(CommandLine cmd) {
+        if (cmd.hasOption("output-file"))
+            this.outputFilePath = Paths.get(cmd.getOptionValue("output-file"));
     }
 
     public boolean isHelp() {

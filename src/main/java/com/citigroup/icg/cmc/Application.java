@@ -1,14 +1,17 @@
 package com.citigroup.icg.cmc;
 
 import java.io.File;
-import java.util.Collection;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 public class Application {
+//--input-path c:\temp --password abc123 --skip-ext zip --output-file c:\temp\cryptutil.output.csv --test
 
-    /*
-        java -jar cryptutil.jar -path c:\temp -password abc123 -input-file c:\temp\input.txt -output-file c:\temp\output.txt
-    */
     public static void main(String[] args) {
         ConsoleProgressReporter reporter = new ConsoleProgressReporter();
         try {
@@ -17,31 +20,20 @@ public class Application {
                 options.displayHelp();
                 System.exit(0);
             }
-
             options = ArchiveOptions.parseRequired(args);
 
-            //TODO #7: read files list from -input-file option
-            /*
-                if (-input-file option set) {
-                    read all lines from -input-file into HashMap (file name must be lowercase)
-                } else {
-                    use FileTraverser.getFiles
-                }
-            */
-            List<File> files = FileTraverser.getFiles(options.getPath(), options.getExcludes());
-            //TODO #8: if 'files' list is empty, throw exception -> 'throw new Exception("There are no file to archive.")
+            List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt());
+            if (files.size() == 0)
+                throw new Exception("There are no files to encrypt.");
 
             ArchiveService service = new ArchiveService(options);
-            Collection<ArchiveResult> results = service.runArchiver(files, reporter);
+            ArchiveResults results = service.runArchiver(files, reporter);
+            reporter.complete();
 
-            //TODO #9: create CSV file if -input-file is set and create header row
-            for (ArchiveResult result : results) {
-                for (FileInfo fileInfo : result.getArchivedFiles()) {
-                    //TODO #9: add columns 'OriginalFileName', 'ArchivedFileName', 'DateCreated', 'FileSize', 'Error'
-                }
-            }
+            CsvReportVisitor visitor = new CsvReportVisitor(options.getOutputFilePath(), reporter);
+            results.accept(visitor);
         } catch (Exception e) {
-            reporter.log(e.getMessage());
+            reporter.log("Error: %s", e.toString());
         }
     }
 }

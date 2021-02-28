@@ -14,10 +14,14 @@ public class ConsoleProgressReporter implements ProgressReporter {
     }
 
     public void log(String message) {
-        System.out.print(message);
+        System.out.println(message);
     }
 
     public void log(String message, Object... args) {
         System.out.printf(message, args);
+    }
+
+    public void complete() {
+        this.progress.close();
     }
 }
