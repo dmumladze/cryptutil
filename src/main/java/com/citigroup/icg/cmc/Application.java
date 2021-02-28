@@ -16,6 +16,13 @@ public class Application {
             }
             options = ArchiveOptions.parseRequired(args);
 
+            OptionsValidationResults validationResults = options.validate();
+
+            if (!validationResults.isValid()) {
+                //validationResults.accept(null);
+                System.exit(0);
+            }
+
             reporter.log("Looking for files...");
 
             List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt());

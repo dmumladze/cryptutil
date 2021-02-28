@@ -55,6 +55,13 @@ public class ArchiveOptions {
         this.setOutputFilePath(cmd);
         this.setHelp(cmd);
     }
+
+    public OptionsValidationResults validate() {
+        OptionsValidationResults results = new OptionsValidationResults();
+
+        return results;
+    }
+
     public Path getInputPath() {
         return inputPath;
     }

@@ -19,7 +19,7 @@ public class ArchiveResults {
         return Collections.unmodifiableCollection(this.archivedFiles);
     }
 
-    public void accept(Visitor<ArchiveResults> visitor) throws Exception {
+    public void accept(Visitor<ArchiveResults> visitor) {
         visitor.visit(this);
     }
 }
