@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
-public class CsvReportVisitor implements Visitor<ArchiveResults> {
+public class CsvReportMaker implements Visitor<ArchiveResults> {
     private Path outputFilePath;
     private final ProgressReporter reporter;
 
-    public CsvReportVisitor(Path outputFilePath, ProgressReporter reporter) {
+    public CsvReportMaker(Path outputFilePath, ProgressReporter reporter) {
         this.outputFilePath = outputFilePath;
         this.reporter = reporter;
     }

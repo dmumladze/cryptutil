@@ -17,25 +17,23 @@ public class Application {
             options = ArchiveOptions.parseRequired(args);
 
             OptionsValidationResults validationResults = options.validate();
-
             if (!validationResults.isValid()) {
-                //validationResults.accept(null);
+                ValidationResultsConsolePrinter printer = new ValidationResultsConsolePrinter();
+                validationResults.accept(printer);
                 System.exit(0);
             }
 
             reporter.log("Looking for files...");
-
             List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt());
             if (files.size() == 0)
                 throw new Exception("There are no files to encrypt.");
-
             reporter.log("Found %d files %n", files.size() - 1);
 
             ArchiveService service = new ArchiveService(options);
             ArchiveResults results = service.runArchiver(files, reporter);
             reporter.complete();
 
-            CsvReportVisitor visitor = new CsvReportVisitor(options.getOutputFilePath(), reporter);
+            CsvReportMaker visitor = new CsvReportMaker(options.getOutputFilePath(), reporter);
             results.accept(visitor);
         } catch (Exception e) {
             reporter.log(e);
