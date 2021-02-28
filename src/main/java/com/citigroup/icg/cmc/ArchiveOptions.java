@@ -24,15 +24,15 @@ public class ArchiveOptions {
 
     static {
         helpOptions = new Options();
-        helpOptions.addOption(null, "help", false, "Displays command-line options.");
+        helpOptions.addOption(null, "help", false, "Displays help for command-line options.");
 
         requiredOptions = new Options();
-        requiredOptions.addRequiredOption("I", "input-path", true, "Directory or file to be searched for.");
+        requiredOptions.addRequiredOption("I", "input-path", true, "Directory or list of file to encrypt. Invalid files will be skipped without warning.");
         requiredOptions.addRequiredOption("P", "password", true, "Password for encrypted files.");
         requiredOptions.addOption("S", "skip-ext", true, "Skips files with provided extensions.");
-        requiredOptions.addOption("T", "test", false, "Test run will neither encrypt nor delete file.");
-        requiredOptions.addOption("O", "output-file", true, "File to print the report to.");
-        requiredOptions.addOption("H", "help", false, "Displays command-line options.");
+        requiredOptions.addOption("T", "test", false, "Test run will neither encrypt nor deletes files, but will generate the full report.");
+        requiredOptions.addOption("O", "output-file", true, "File to print the report to. If the file exists, it will be recreated with each run.");
+        requiredOptions.addOption("H", "help", false, "Displays help for command-line options.");
     }
 
     public static ArchiveOptions parseHelp(String[] args) throws ParseException {

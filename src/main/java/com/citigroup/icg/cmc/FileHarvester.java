@@ -25,16 +25,15 @@ public class FileHarvester {
             List<String> filePaths = Files.readAllLines(path)
                     .stream().map(f -> f.toLowerCase(Locale.ROOT))
                     .distinct()
-                    .filter(name -> !excludes.contains(name.substring(name.lastIndexOf(".") + 1)))
+                    .filter(name -> excludes == null || !excludes.contains(name.substring(name.lastIndexOf(".") + 1)))
                     .collect(Collectors.toList());
 
             if (filePaths.isEmpty())
                 throw new Exception(String.format("Input file '%s' is empty.", path.toString()));
 
             for (String filePath : filePaths) {
-                if (Files.notExists(Paths.get(filePath)))
-                    throw new Exception(String.format("File '%s' does not exist.", filePath));
-                files.add(new File(filePath));
+                if (Files.exists(Paths.get(filePath)))
+                    files.add(new File(filePath));
             }
         }
         return files;
@@ -49,7 +48,7 @@ public class FileHarvester {
                 if (!Files.isRegularFile(file.toPath()))
                     continue;
                 String name = file.getName();
-                if (!excludes.contains(name.substring(name.lastIndexOf(".") + 1)))
+                if (excludes == null || !excludes.contains(name.substring(name.lastIndexOf(".") + 1)))
                     files.add(file);
             } else {
                 collectFiles(file.toPath(), files, excludes);

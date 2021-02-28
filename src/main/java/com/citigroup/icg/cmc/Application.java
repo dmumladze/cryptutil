@@ -1,12 +1,6 @@
 package com.citigroup.icg.cmc;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 public class Application {
@@ -33,7 +27,7 @@ public class Application {
             CsvReportVisitor visitor = new CsvReportVisitor(options.getOutputFilePath(), reporter);
             results.accept(visitor);
         } catch (Exception e) {
-            reporter.log("Error: %s", e.toString());
+            reporter.log(e);
         }
     }
 }
