@@ -65,8 +65,8 @@ public class ArchiveService {
                     Files.deleteIfExists(Paths.get(zipFile.getAbsolutePath()));
                 } else {
                     fileInfo.setArchivedFile(zipFile.getAbsolutePath());
-                    file.setWritable(true);
-                    Files.delete(file.toPath());
+                    if (file.setWritable(true))
+                        Files.delete(file.toPath());
                 }
             } catch (Exception e) {
                 fileInfo.setException(e);
