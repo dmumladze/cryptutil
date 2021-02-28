@@ -61,7 +61,7 @@ public class ArchiveService {
             try {
                 File zipFile = archiveFile(file);
                 if (this.options.isTest()) {
-                    //delete file if program running with --estimate option
+                    //delete file if program running with --test option
                     Files.deleteIfExists(Paths.get(zipFile.getAbsolutePath()));
                 } else {
                     fileInfo.setArchivedFile(zipFile.getAbsolutePath());
