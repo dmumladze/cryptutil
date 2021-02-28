@@ -37,9 +37,7 @@ public class ArchiveService {
         try {
             List<Future<ArchiveResults>> futureResults = exec.invokeAll(tasks);
             for (Future<ArchiveResults> result : futureResults) {
-                for (ArchiveFileInfo fileInfo : result.get().getArchivedFiles()) {
-                    results.addArchivedFile(fileInfo);
-                }
+                results.Merge(result.get());
             }
         } catch (InterruptedException | ExecutionException e) {
             reporter.log(e.getMessage());

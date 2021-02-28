@@ -19,6 +19,12 @@ public class ArchiveResults {
         return Collections.unmodifiableCollection(this.archivedFiles);
     }
 
+    public void Merge(ArchiveResults other) {
+        for (ArchiveFileInfo fileInfo : other.getArchivedFiles()) {
+            this.addArchivedFile(fileInfo);
+        }
+    }
+
     public void accept(Visitor<ArchiveResults> visitor) {
         visitor.visit(this);
     }
