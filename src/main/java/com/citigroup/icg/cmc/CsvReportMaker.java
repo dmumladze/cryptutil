@@ -29,18 +29,16 @@ public class CsvReportMaker implements Visitor<ArchiveResults> {
             }
 
             PrintWriter writer = new PrintWriter(new FileWriter(outputFilePath.toFile().getAbsoluteFile()));
+            writer.println("OriginalFileName|ArchivedFileName|DateCreated|FileSize|Error");
 
             for (ArchiveFileInfo fileInfo : results.getArchivedFiles()) {
                 String originalFile = fileInfo.getOriginalFile();
                 String archivedFile = fileInfo.getArchivedFile();
 
                 BasicFileAttributes attributes = null;
-
                 if (Files.exists(Paths.get(archivedFile))) {
-                    writer.println("OriginalFileName|ArchivedFileName|DateCreated|ArchivedFileSize|Error");
                     attributes = Files.readAttributes(Paths.get(archivedFile), BasicFileAttributes.class);
                 } else if (Files.exists(Paths.get(originalFile))) {
-                    writer.println("OriginalFileName|ArchivedFileName|DateCreated|OriginalFileSize|Error");
                     attributes = Files.readAttributes(Paths.get(originalFile), BasicFileAttributes.class);
                 }
 
@@ -48,12 +46,10 @@ public class CsvReportMaker implements Visitor<ArchiveResults> {
                     writer.println(String.format("%s|%s|%s|%s|%s", originalFile, archivedFile,
                             attributes.creationTime(),
                             attributes.size(),
-                            fileInfo.getExceptionAsString()
-                    ));
+                            fileInfo.getExceptionAsString()));
                 } else {
                     writer.println(String.format("%s|%s|%s|%s|%s", originalFile, archivedFile,
-                            "", "", fileInfo.getExceptionAsString()
-                    ));
+                            "", "", fileInfo.getExceptionAsString()));
                 }
             }
             writer.close();

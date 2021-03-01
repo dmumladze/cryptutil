@@ -4,8 +4,16 @@ import java.io.File;
 import java.util.List;
 
 public class Application {
-//--input-path c:\temp --password abc123 --skip-ext zip --output-file c:\temp\cryptutil.output.csv --test
+    /*
+        run with input path as folder
+        --input-path c:\temp --password abc123 --skip-ext zip,csv,txt --output-file c:\temp\cryptutil.output.csv --test
 
+        run without output file
+        --input-path c:\temp --password abc123 --skip-ext zip --test
+
+        run with input file output file
+        --input-path c:\temp\input.txt --password abc123 --skip-ext zip --test
+    */
     public static void main(String[] args) {
         ConsoleProgressReporter reporter = new ConsoleProgressReporter();
         try {

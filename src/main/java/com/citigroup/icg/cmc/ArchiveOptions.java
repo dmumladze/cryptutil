@@ -56,7 +56,8 @@ public class ArchiveOptions {
 
     public ValidationResults validate() {
         ValidationResults results = new ValidationResults();
-
+        //TODO: validate all input options
+        results.addInputPathError("Some error");
         return results;
     }
 

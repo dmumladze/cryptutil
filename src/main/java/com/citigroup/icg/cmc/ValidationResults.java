@@ -3,46 +3,46 @@ package com.citigroup.icg.cmc;
 import java.util.ArrayList;
 
 public class ValidationResults {
-    private ArrayList<String> inputPathErrors;
-    private ArrayList<String> passwordErrors;
-    private ArrayList<String> skipExtErrors;
-    private ArrayList<String> outputFilePathErrors;
+    private final ArrayList<String> inputPathErrors = new ArrayList<>();
+    private final ArrayList<String> passwordErrors = new ArrayList<>();
+    private final ArrayList<String> skipExtErrors = new ArrayList<>();
+    private final ArrayList<String> outputFilePathErrors = new ArrayList<>();
 
     public ArrayList<String> getInputPathErrors() {
         return inputPathErrors;
     }
 
-    public void addInputPathError(String Error) {
-        this.inputPathErrors.add(Error);
+    public void addInputPathError(String error) {
+        inputPathErrors.add(error);
     }
 
     public ArrayList<String> getPasswordErrors() {
         return passwordErrors;
     }
 
-    public void addPasswordError(String Error) {
-        this.passwordErrors.add(Error);
+    public void addPasswordError(String error) {
+        passwordErrors.add(error);
     }
 
     public ArrayList<String> getSkipExtErrors() {
         return skipExtErrors;
     }
 
-    public void addSkipExtError(String Error) {
-        this.skipExtErrors.add(Error);
+    public void addSkipExtError(String error) {
+        skipExtErrors.add(error);
     }
 
     public ArrayList<String> getOutputFilePathErrors() {
         return outputFilePathErrors;
     }
 
-    public void addOutputFilePathError(String Error) {
-        this.outputFilePathErrors.add(Error);
+    public void addOutputFilePathError(String error) {
+        outputFilePathErrors.add(error);
     }
 
     public boolean isValid() {
-        return inputPathErrors == null && passwordErrors == null && skipExtErrors == null
-                && outputFilePathErrors == null;
+        return inputPathErrors.isEmpty() && passwordErrors.isEmpty() && skipExtErrors.isEmpty()
+                && outputFilePathErrors.isEmpty();
     }
 
     public void accept(Visitor<ValidationResults> visitor) {
