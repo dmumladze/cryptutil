@@ -1,6 +1,7 @@
 package com.citigroup.icg.cmc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ValidationResults {
     private final ArrayList<String> inputPathErrors = new ArrayList<>();
@@ -8,7 +9,7 @@ public class ValidationResults {
     private final ArrayList<String> skipExtErrors = new ArrayList<>();
     private final ArrayList<String> outputFilePathErrors = new ArrayList<>();
 
-    public ArrayList<String> getInputPathErrors() {
+    public Collection<String> getInputPathErrors() {
         return inputPathErrors;
     }
 
@@ -16,7 +17,7 @@ public class ValidationResults {
         inputPathErrors.add(error);
     }
 
-    public ArrayList<String> getPasswordErrors() {
+    public Collection<String> getPasswordErrors() {
         return passwordErrors;
     }
 
@@ -24,7 +25,7 @@ public class ValidationResults {
         passwordErrors.add(error);
     }
 
-    public ArrayList<String> getSkipExtErrors() {
+    public Collection<String> getSkipExtErrors() {
         return skipExtErrors;
     }
 
@@ -32,7 +33,7 @@ public class ValidationResults {
         skipExtErrors.add(error);
     }
 
-    public ArrayList<String> getOutputFilePathErrors() {
+    public Collection<String> getOutputFilePathErrors() {
         return outputFilePathErrors;
     }
 

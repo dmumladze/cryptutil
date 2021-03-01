@@ -1,6 +1,6 @@
 package com.citigroup.icg.cmc;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 public class ValidationResultsPrinter implements Visitor<ValidationResults> {
 
@@ -15,8 +15,8 @@ public class ValidationResultsPrinter implements Visitor<ValidationResults> {
                 * is not strong
                 * is missing
         */
-        ArrayList<String> intputPathErrors = results.getInputPathErrors();
-        if (intputPathErrors != null) {
+        Collection<String> intputPathErrors = results.getInputPathErrors();
+        if (!intputPathErrors.isEmpty()) {
             //print error here
         }
     }
