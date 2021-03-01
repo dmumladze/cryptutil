@@ -8,12 +8,12 @@ public class ValidationResultsPrinter implements Visitor<ValidationResults> {
     public void visit(ValidationResults results) {
         /*
             TODO: System.out.println all validation error
-            --input-path:
-                * does not exist
-
-            --password:
-                * is not strong
-                * is missing
+            Validation errors:
+            input-path
+                - does not exist
+            password
+                - is not strong
+                - is missing
         */
         Collection<String> intputPathErrors = results.getInputPathErrors();
         if (!intputPathErrors.isEmpty()) {
