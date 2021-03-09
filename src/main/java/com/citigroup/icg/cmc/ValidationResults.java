@@ -7,6 +7,7 @@ public class ValidationResults {
     private final ArrayList<String> inputPathErrors = new ArrayList<>();
     private final ArrayList<String> passwordErrors = new ArrayList<>();
     private final ArrayList<String> skipExtErrors = new ArrayList<>();
+    private final ArrayList<String> skipOlderThanErrors = new ArrayList<>();
     private final ArrayList<String> outputFilePathErrors = new ArrayList<>();
 
     public Collection<String> getInputPathErrors() {
@@ -33,6 +34,14 @@ public class ValidationResults {
         skipExtErrors.add(error);
     }
 
+    public Collection<String> getskipOlderThanErrors() {
+        return skipOlderThanErrors;
+    }
+
+    public void addSkipOlderThanErrors(String error) {
+        skipOlderThanErrors.add(error);
+    }
+
     public Collection<String> getOutputFilePathErrors() {
         return outputFilePathErrors;
     }
@@ -41,9 +50,9 @@ public class ValidationResults {
         outputFilePathErrors.add(error);
     }
 
-    public boolean isValid() {
-        return inputPathErrors.isEmpty() && passwordErrors.isEmpty() && skipExtErrors.isEmpty()
-                && outputFilePathErrors.isEmpty();
+    public boolean isInvalid() {
+        return !inputPathErrors.isEmpty() || !passwordErrors.isEmpty() || !skipExtErrors.isEmpty()
+                || !outputFilePathErrors.isEmpty() || !skipOlderThanErrors.isEmpty();
     }
 
     public void accept(Visitor<ValidationResults> visitor) {

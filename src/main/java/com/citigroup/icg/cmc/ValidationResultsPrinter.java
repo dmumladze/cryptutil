@@ -33,5 +33,11 @@ public class ValidationResultsPrinter implements Visitor<ValidationResults> {
             System.out.println("--output-file");
             outputFilePathErrors.forEach(e -> System.out.println("\t" + e));
         }
+
+        Collection<String> skipOlderThanDaysErrors = results.getskipOlderThanErrors();
+        if (!skipOlderThanDaysErrors.isEmpty()) {
+            System.out.println("--older-than-days");
+            skipOlderThanDaysErrors.forEach(e -> System.out.println("\t" + e));
+        }
     }
 }

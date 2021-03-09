@@ -24,15 +24,15 @@ public class Application {
             }
             options = ArchiveOptions.parseRequired(args);
 
-            ValidationResults validationResults = options.validate();
-            if (!validationResults.isValid()) {
+            ValidationResults validationResults = options.getValidationResults();
+            if (validationResults.isInvalid()) {
                 ValidationResultsPrinter printer = new ValidationResultsPrinter();
                 validationResults.accept(printer);
                 System.exit(0);
             }
 
             reporter.log("Looking for files...");
-            List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt());
+            List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt(), options.getSkipOlderThan());
             if (files.size() == 0)
                 throw new Exception("There are no files to encrypt.");
             reporter.log("Found %d files %n", files.size() - 1);

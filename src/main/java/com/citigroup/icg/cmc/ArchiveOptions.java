@@ -3,13 +3,13 @@ package com.citigroup.icg.cmc;
 import org.apache.commons.cli.*;
 
 import java.io.File;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,11 +19,17 @@ public class ArchiveOptions {
     private Path inputPath;
     private String password;
     private Collection<String> skipExt;
+    private Integer skipOlderThan;
     private boolean test;
     private Path outputFilePath;
     private boolean help;
     private static final Options helpOptions;
     private static final Options requiredOptions;
+    private final ValidationResults validationResults = new ValidationResults();
+    private final Pattern upperPattern = Pattern.compile("[A-Z]");
+    private final Pattern lowerPattern = Pattern.compile("[a-z]");
+    private final Pattern numbersPattern = Pattern.compile("[0-9]");
+    private final Pattern alphaNumericPattern = Pattern.compile("[^a-zA-Z0-9]");
 
     static {
         helpOptions = new Options();
@@ -55,50 +61,14 @@ public class ArchiveOptions {
         this.setInputPath(cmd);
         this.setPassword(cmd);
         this.setSkipExt(cmd);
+        this.setSkipOlderThan(cmd);
         this.setTest(cmd);
         this.setOutputFilePath(cmd);
         this.setHelp(cmd);
     }
 
-    public ValidationResults validate() {
-        ValidationResults results = new ValidationResults();
-
-        Pattern upper = Pattern.compile("[A-Z]");
-        Pattern lower = Pattern.compile("[a-z]");
-        Pattern numbers = Pattern.compile("[0-9]");
-        Pattern alphaNumeric = Pattern.compile("[^a-zA-Z0-9]");
-
-        if (Files.notExists(inputPath))
-            results.addInputPathError("Input path does not exist.");
-
-        if (password.length() < 6)
-            results.addPasswordError("The password contains less than 6 chars.");
-        if (!textMatches(upper, password))
-            results.addPasswordError("The password does not contain upper case letters.");
-        if (!textMatches(lower, password))
-            results.addPasswordError("The password does not contain lower case letters.");
-        if (!textMatches(numbers, password))
-            results.addPasswordError("The password does not contain numbers.");
-        if (!textMatches(alphaNumeric, password))
-            results.addPasswordError("The password does not contain special characters.");
-
-        for (String ext : skipExt) {
-            if (textMatches(alphaNumeric, ext)) {
-                results.addSkipExtError(String.format("'%s' contains special chars.", ext));
-            }
-        }
-
-        if (outputFilePath != null) {
-            try {
-                Files.createFile(outputFilePath);
-            } catch (Exception e) {
-                results.addOutputFilePathError("Output file path is invalid.");
-            }
-        }
-
-        //TODO: --skip-older-than argument should not be less then 0
-
-        return results;
+    public ValidationResults getValidationResults() {
+        return validationResults;
     }
 
     private boolean textMatches(Pattern pattern, String text) {
@@ -113,6 +83,11 @@ public class ArchiveOptions {
     private void setInputPath(CommandLine cmd) {
         if (cmd.hasOption("input-path"))
             this.inputPath = Paths.get(cmd.getOptionValue("input-path"));
+
+        if (inputPath == null)
+            validationResults.addInputPathError("Input path not provided.");
+        else if (Files.notExists(inputPath))
+            validationResults.addInputPathError("Input path does not exist.");
     }
 
     public String getPassword() {
@@ -122,6 +97,21 @@ public class ArchiveOptions {
     private void setPassword(CommandLine cmd) {
         if (cmd.hasOption("password"))
             this.password = cmd.getOptionValue("password");
+
+        if (password == null) {
+            validationResults.addPasswordError("The password not provided.");
+        } else {
+            if (password.length() < 6)
+                validationResults.addPasswordError("The password contains less than 6 chars.");
+            if (!textMatches(upperPattern, password))
+                validationResults.addPasswordError("The password does not contain upper case letters.");
+            if (!textMatches(lowerPattern, password))
+                validationResults.addPasswordError("The password does not contain lower case letters.");
+            if (!textMatches(numbersPattern, password))
+                validationResults.addPasswordError("The password does not contain numbers.");
+            if (!textMatches(alphaNumericPattern, password))
+                validationResults.addPasswordError("The password does not contain special characters.");
+        }
     }
 
     public Collection<String> getSkipExt() {
@@ -131,10 +121,40 @@ public class ArchiveOptions {
     private void setSkipExt(CommandLine cmd) {
         if (!cmd.hasOption("skip-ext"))
             return;
-        this.skipExt = Arrays.stream(cmd.getOptionValue("skip-ext").split(","))
+        this.skipExt = Arrays.stream(cmd.getOptionValue("skip-ext").split(",")) // 0,1
                 .distinct()
                 .map(x -> x.toLowerCase(Locale.ROOT))
                 .collect(Collectors.toCollection(ArrayList<String>::new));
+
+        for (String ext : skipExt) {
+            if (textMatches(alphaNumericPattern, ext)) {
+                validationResults.addSkipExtError(String.format("'%s' contains special chars.", ext));
+            }
+        }
+    }
+
+    public Integer getSkipOlderThan() {
+        return this.skipOlderThan;
+    }
+
+    private void setSkipOlderThan(CommandLine cmd) {
+        if (!cmd.hasOption("skip-older-than"))
+            return;
+        String skipOlderThanValue = cmd.getOptionValue("skip-older-than");
+        if (skipOlderThanValue == null)
+            return;
+        try {
+            this.skipOlderThan = Integer.parseInt(skipOlderThanValue);
+            if (this.skipOlderThan <= 0) {
+                validationResults.addSkipOlderThanErrors("Must be greater than 0.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            validationResults.addSkipOlderThanErrors("Invalid number.");
+        }
+        if (skipOlderThanValue.startsWith("0")) {
+            validationResults.addSkipOlderThanErrors("Must start with a number greater than 0.");
+        }
     }
 
     public boolean isTest() {
@@ -152,6 +172,17 @@ public class ArchiveOptions {
     private void setOutputFilePath(CommandLine cmd) {
         if (cmd.hasOption("output-file"))
             this.outputFilePath = Paths.get(cmd.getOptionValue("output-file"));
+        else
+            return;
+
+        if (Files.exists(outputFilePath)) {
+            try {
+                Files.deleteIfExists(outputFilePath);
+                Files.createFile(outputFilePath);
+            } catch (Exception e) {
+                validationResults.addOutputFilePathError("Output file path is invalid.");
+            }
+        }
     }
 
     public boolean isHelp() {
