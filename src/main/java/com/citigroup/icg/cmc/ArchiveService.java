@@ -22,7 +22,7 @@ public class ArchiveService {
     public ArchiveResults runArchiver(List<File> files, ProgressReporter reporter) {
         this.storage = new FileStorage(files);
 
-        reporter.init(files.size() - 1);
+        reporter.init(files.size());
 
         List<Callable<ArchiveResults>> tasks = new ArrayList<>();
         //use only 70% of processors' cores
