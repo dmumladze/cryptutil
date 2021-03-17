@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.citigroup</groupId>
+    <groupId>m0bydk</groupId>
     <artifactId>cryptutil</artifactId>
     <version>2.0</version>
 
@@ -74,7 +74,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.citigroup.icg.cmc.Application</mainClass>
+                            <mainClass>m0bydk.cryptutil.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

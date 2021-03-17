@@ -1,6 +1,4 @@
-package com.citigroup.icg.cmc;
-
-import me.tongfei.progressbar.ProgressBar;
+package m0bydk.cryptutil;
 
 public interface ProgressReporter {
     void init(long max);

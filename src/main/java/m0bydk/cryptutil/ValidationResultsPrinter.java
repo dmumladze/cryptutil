@@ -1,9 +1,6 @@
-package com.citigroup.icg.cmc;
-
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
+package m0bydk.cryptutil;
 
 import java.util.Collection;
-
 
 public class ValidationResultsPrinter implements Visitor<ValidationResults> {
 

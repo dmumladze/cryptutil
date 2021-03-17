@@ -1,4 +1,4 @@
-package com.citigroup.icg.cmc;
+package m0bydk.cryptutil;
 
 public class ArchiveFileInfo {
     private String originalFile;
