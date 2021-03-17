@@ -33,29 +33,23 @@ public class Application {
 
             reporter.log("Looking for files...");
             List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt(), options.getSkipOlderThan());
-            if (files.size() == 1) {
-                reporter.log("Found %d file %n", files.size());
-
-                ArchiveService service = new ArchiveService(options);
-                ArchiveResults results = service.runArchiver(files, reporter);
-                reporter.complete();
-
-                CsvReportMaker visitor = new CsvReportMaker(options.getOutputFilePath(), reporter);
-                results.accept(visitor);
-                return;
-            }
+            if (files.size() == 1)
+                reporter.log("Found %d file(s) %n", files.size());
             if (files.size() == 0)
                 throw new Exception("There are no files to encrypt.");
-            reporter.log("Found %d files %n", files.size());
 
-            ArchiveService service = new ArchiveService(options);
-            ArchiveResults results = service.runArchiver(files, reporter);
-            reporter.complete();
-
-            CsvReportMaker visitor = new CsvReportMaker(options.getOutputFilePath(), reporter);
-            results.accept(visitor);
+            startArchiving(options, files, reporter);
         } catch (Exception e) {
             reporter.log(e);
         }
+    }
+
+    private static void startArchiving(ArchiveOptions options, List<File> files, ProgressReporter reporter) {
+        ArchiveService service = new ArchiveService(options);
+        ArchiveResults results = service.runArchiver(files, reporter);
+        reporter.complete();
+
+        CsvReportMaker visitor = new CsvReportMaker(options.getOutputFilePath(), reporter);
+        results.accept(visitor);
     }
 }
