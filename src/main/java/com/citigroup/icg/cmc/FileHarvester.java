@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class FileHarvester {
 
-    public static List<File> harvest(Path path, Collection<String> excludeExtensions, Integer skipOlderThanDays) throws Exception {
+    public static List<File> harvest(Path path, Collection<String> excludeExtensions, int skipOlderThanDays) throws Exception {
         if (Files.notExists(path))
             throw new Exception(String.format("Input path '%s' does not exist.", path.toString()));
 
@@ -46,7 +46,7 @@ public class FileHarvester {
     }
 
     private static void collectFiles(Path path, List<File> files, Collection<String> excludeExtensions,
-                                     Integer skipOlderThanDays, Instant maxModifiedInstant) throws IOException {
+                                     int skipOlderThanDays, Instant maxModifiedInstant) throws IOException {
         File[] fileList = path.toFile().listFiles();
         if (fileList == null)
             return;

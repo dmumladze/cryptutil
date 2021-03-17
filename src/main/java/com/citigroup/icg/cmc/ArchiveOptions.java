@@ -2,14 +2,12 @@ package com.citigroup.icg.cmc;
 
 import org.apache.commons.cli.*;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +17,7 @@ public class ArchiveOptions {
     private Path inputPath;
     private String password;
     private Collection<String> skipExt;
-    private Integer skipOlderThan;
+    private int skipOlderThan; //int vs. Integer
     private boolean test;
     private Path outputFilePath;
     private boolean help;
@@ -127,6 +125,10 @@ public class ArchiveOptions {
                 .collect(Collectors.toCollection(ArrayList<String>::new));
 
         for (String ext : skipExt) {
+            if (ext.length() < 2) {
+                validationResults.addSkipExtError(String.format("Extension can not be more than 3 chars.\n\t'%s'", ext));
+                return;
+            }
             if (textMatches(alphaNumericPattern, ext)) {
                 validationResults.addSkipExtError(String.format("'%s' contains special chars.", ext));
             }
