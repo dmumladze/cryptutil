@@ -1,4 +1,4 @@
-package com.citigroup.icg.cmc;
+package m0bydk.cryptutil;
 
 import java.io.File;
 import java.io.FileWriter;

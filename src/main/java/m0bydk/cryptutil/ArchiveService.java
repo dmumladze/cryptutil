@@ -1,4 +1,4 @@
-package com.citigroup.icg.cmc;
+package m0bydk.cryptutil;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
