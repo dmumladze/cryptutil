@@ -33,10 +33,9 @@ public class Application {
 
             reporter.log("Looking for files...");
             List<File> files = FileHarvester.harvest(options.getInputPath(), options.getSkipExt(), options.getSkipOlderThan());
-            if (files.size() == 1)
-                reporter.log("Found %d file(s) %n", files.size());
+            reporter.log("Found %d file(s) %n", files.size());
             if (files.size() == 0)
-                throw new Exception("There are no files to encrypt.");
+                return;
 
             startArchiving(options, files, reporter);
         } catch (Exception e) {
